@@ -61,6 +61,13 @@ PLATFORM=$(COMPILE_PLATFORM)
 endif
 export PLATFORM
 
+ifeq ($(PLATFORM),mingw32)
+  MINGW=1
+endif
+ifeq ($(PLATFORM),mingw64)
+  MINGW=1
+endif
+
 ifeq ($(COMPILE_ARCH),i86pc)
   COMPILE_ARCH=x86
 endif
@@ -164,7 +171,7 @@ USE_CURL=1
 endif
 
 ifndef USE_CURL_DLOPEN
-  ifeq ($(PLATFORM),mingw32)
+  ifdef MINGW
     USE_CURL_DLOPEN=0
   else
     USE_CURL_DLOPEN=1
@@ -364,6 +371,9 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
     OPTIMIZEVM += -mtune=ultrasparc3 -mv8plus
     HAVE_VM_COMPILED=true
   endif
+  ifeq ($(ARCH),armv7l)
+    HAVE_VM_COMPILED=true
+  endif
   ifeq ($(ARCH),alpha)
     # According to http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=410555
     # -ffast-math will cause the client to die with SIGFPE on Alpha
@@ -508,7 +518,7 @@ else # ifeq darwin
 # SETUP AND BUILD -- MINGW32
 #############################################################################
 
-ifeq ($(PLATFORM),mingw32)
+ifdef MINGW
 
   ifeq ($(CROSS_COMPILING),1)
     # If CC is already set to something generic, we probably want to use
@@ -656,7 +666,7 @@ ifeq ($(PLATFORM),mingw32)
     SDLDLL=SDL2.dll
   endif
 
-else # ifeq mingw32
+else # ifdef MINGW
 
 #############################################################################
 # SETUP AND BUILD -- FREEBSD
@@ -909,7 +919,7 @@ else # ifeq sunos
 
 endif #Linux
 endif #darwin
-endif #mingw32
+endif #MINGW
 endif #FreeBSD
 endif #OpenBSD
 endif #NetBSD
@@ -1293,6 +1303,7 @@ targets: makedirs
 	@echo "  VERSION: $(VERSION)"
 	@echo "  COMPILE_PLATFORM: $(COMPILE_PLATFORM)"
 	@echo "  COMPILE_ARCH: $(COMPILE_ARCH)"
+	@echo "  HAVE_VM_COMPILED: $(HAVE_VM_COMPILED)"
 	@echo "  CC: $(CC)"
 ifeq ($(PLATFORM),mingw32)
 	@echo "  WINDRES: $(WINDRES)"
@@ -1649,7 +1660,7 @@ Q3OBJ = \
   $(B)/client/con_log.o \
   $(B)/client/sys_main.o
 
-ifeq ($(PLATFORM),mingw32)
+ifdef MINGW
   Q3OBJ += \
     $(B)/client/con_passive.o
 else
@@ -2091,9 +2102,12 @@ ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),sparc)
     Q3OBJ += $(B)/client/vm_sparc.o
   endif
+  ifeq ($(ARCH),armv7l)
+    Q3OBJ += $(B)/client/vm_armv7l.o
+  endif
 endif
 
-ifeq ($(PLATFORM),mingw32)
+ifdef MINGW
   Q3OBJ += \
     $(B)/client/win_resource.o \
     $(B)/client/sys_win32.o
@@ -2259,9 +2273,12 @@ ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),sparc)
     Q3DOBJ += $(B)/ded/vm_sparc.o
   endif
+  ifeq ($(ARCH),armv7l)
+    Q3DOBJ += $(B)/client/vm_armv7l.o
+  endif
 endif
 
-ifeq ($(PLATFORM),mingw32)
+ifdef MINGW
   Q3DOBJ += \
     $(B)/ded/win_resource.o \
     $(B)/ded/sys_win32.o \
@@ -2877,7 +2894,7 @@ distclean: clean toolsclean
 	@rm -rf $(BUILD_DIR)
 
 installer: release
-ifeq ($(PLATFORM),mingw32)
+ifdef MINGW
 	@$(MAKE) VERSION=$(VERSION) -C $(NSISDIR) V=$(V) \
 		SDLDLL=$(SDLDLL) \
 		USE_RENDERER_DLOPEN=$(USE_RENDERER_DLOPEN) \
