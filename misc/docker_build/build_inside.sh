@@ -17,8 +17,8 @@ pushd /usr/src/ioq3\
   baseq3/cgame baseq3/game baseq3/qcommon baseq3/ui \
   missionpack/cgame missionpack/game missionpack/qcommon missionpack/ui \
  && popd\
- && mv release-linux-armv7l ioq3-linux-armv7l-${IOQ3_REL}\
- && tar cJvf /tmp/out/ioq3-linux-armv7l-${IOQ3_REL}.tar.xz ioq3-linux-armv7l-${IOQ3_REL} \
+ && mv release-linux-armv7l ioq3-linux-armv7l-${VERSION}\
+ && tar cJvf /tmp/out/ioq3-linux-armv7l-${VERSION}.tar.xz ioq3-linux-armv7l-${VERSION} \
  && popd
 
 echo "Sucessfuly built IOQ3"

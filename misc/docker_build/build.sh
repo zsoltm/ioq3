@@ -30,7 +30,8 @@ cleanup() {
     rm -Rf ${buildDir}
 }
 
-docker run --rm -t -v ${buildDir}:/tmp/out -v `realpath ../..`:/usr/src/ioq3 -e IOQ3_REL=${IOQ3_REL}\
+docker run --rm -t -v ${buildDir}:/tmp/out -v `realpath ../..`:/usr/src/ioq3\
+   -e VERSION=${IOQ3_REL} -e USE_GIT=0\
    zsoltm/buildpack-deps:jessie-armhf /usr/src/ioq3/misc/build-docker/build-ioq3.sh\
  || (cleanup ; exit 5)
 
