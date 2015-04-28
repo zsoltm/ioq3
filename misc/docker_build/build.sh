@@ -8,7 +8,7 @@ popds() {
    popd > /dev/null
 }
 
-pushds $(dirname "${BASH_SOURCE[0]}") > /dev/null
+pushd $(dirname "${BASH_SOURCE[0]}")
 
 if [ -z "${1}" ]; then
     echo "First argument must be a valid release tag VERSION REL_ is prepended automatically";
@@ -32,7 +32,7 @@ cleanup() {
 
 docker run --rm -t -v ${buildDir}:/tmp/out -v `realpath ../..`:/usr/src/ioq3\
    -e VERSION=${IOQ3_REL} -e USE_GIT=0\
-   zsoltm/buildpack-deps:jessie-armhf /usr/src/ioq3/misc/build-docker/build-ioq3.sh\
+   zsoltm/buildpack-deps:jessie-armhf /usr/src/ioq3/misc/docker_build/build_inside.sh\
  || (cleanup ; exit 5)
 
 ## Create & Upload github release
